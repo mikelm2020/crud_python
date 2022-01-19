@@ -36,11 +36,25 @@ class ClientService:
         self._save_to_disk(updated_clients)
 
 
+    def delete_client(self,deleted_client):
+        clients = self.list_clients()
+
+        active_clients = []
+        for client in clients:
+            if client['uid'] != deleted_client.uid:
+                active_clients.append(client)
+    
+        self._save_to_disk(active_clients)
+
+    
     def _save_to_disk(self, clients):
         tmp_table_name = self.table_name + '.tmp'
-        with open(tmp_table_name) as f:
+        with open(tmp_table_name, mode='w') as f:
             writer = csv.DictWriter(f, fieldnames=Client.schema())
             writer.writerows(clients)
 
         os.remove(self.table_name)
         os.rename(tmp_table_name, self.table_name)
+
+    
+    
